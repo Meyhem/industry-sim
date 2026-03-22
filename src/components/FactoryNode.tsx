@@ -7,7 +7,7 @@ import { Item } from '../types';
 interface FactoryNodeProps extends NodeProps<FactoryNodeData> {}
 
 const FactoryNode: React.FC<FactoryNodeProps> = ({ data }) => {
-  const progressPercent = data.progress > 0 ? ((20 - data.progress) / 20) * 100 : 0; // Assume max 20 ticks
+  const progressPercent = data.progress > 0 ? ((data.maxTicks - data.progress) / data.maxTicks) * 100 : 0;
 
   const renderInventory = (summary: Partial<Record<Item, number>>, title: string) => (
     <div>

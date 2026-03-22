@@ -36,6 +36,7 @@ export class Factory {
     return {
       recipeName: this.recipe.name,
       progress: this.progress,
+      maxTicks: this.recipe.ticks,
       inputSummary: this.inputInventory.toSummary(),
       outputSummary: this.outputInventory.toSummary(),
     };

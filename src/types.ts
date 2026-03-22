@@ -19,6 +19,7 @@ export interface Recipe {
 export interface FactoryNodeData {
   recipeName: string;
   progress: number;
+  maxTicks: number;
   inputSummary: Partial<Record<Item, number>>;
   outputSummary: Partial<Record<Item, number>>;
 }
