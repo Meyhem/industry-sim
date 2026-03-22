@@ -43,6 +43,9 @@ const App: React.FC = () => {
     gameRef.current.addFactory('mine-iron-1', 'mine-iron', { x: 100, y: 100 });
     gameRef.current.addFactory('mine-coal-1', 'mine-coal', { x: 300, y: 100 });
     gameRef.current.addFactory('smelt-steel-1', 'smelt-steel', { x: 200, y: 300 });
+    gameRef.current!.addEdge({ source: 'mine-iron-1', target: 'smelt-steel-1', sourceHandle: null, targetHandle: null });
+    gameRef.current!.addEdge({ source: 'mine-coal-1', target: 'smelt-steel-1', sourceHandle: null, targetHandle: null });
+    setEdges(gameRef.current!.getEdges());
     updateDerived();
   }, [updateDerived]);
 
