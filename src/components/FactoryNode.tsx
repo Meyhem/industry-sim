@@ -9,12 +9,20 @@ interface FactoryNodeProps extends NodeProps<FactoryNodeData> {}
 const FactoryNode: React.FC<FactoryNodeProps> = ({ data }) => {
   const progressPercent = data.progress > 0 ? ((data.maxTicks - data.progress) / data.maxTicks) * 100 : 0;
 
+  const formatQuantity = (qty: number): string => {
+    if (qty >= 1e12) return `${(qty / 1e12).toFixed(1)} Mt`;
+    if (qty >= 1e9) return `${(qty / 1e9).toFixed(1)} kt`;
+    if (qty >= 1e6) return `${(qty / 1e6).toFixed(1)} t`;
+    if (qty >= 1000) return `${(qty / 1000).toFixed(1)} kg`;
+    return `${qty} g`;
+  };
+
   const renderInventory = (summary: Partial<Record<Item, number>>, title: string) => (
     <div>
       <strong>{title}:</strong>
       <ul style={{ fontSize: '10px', margin: 0, paddingLeft: '10px' }}>
         {Object.entries(summary).map(([item, qty]) => (
-          <li key={item}>{item}: {qty}g</li>
+          <li key={item}>{item}: {formatQuantity(qty)}</li>
         ))}
       </ul>
     </div>

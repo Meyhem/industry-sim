@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -20,6 +20,8 @@ const initialEdges: GameEdges = [];
 
 const App: React.FC = () => {
   const gameRef = useRef<Game | null>(null);
+  const [autoTickEnabled, setAutoTickEnabled] = useState(false);
+  const intervalRef = useRef<number | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
@@ -30,6 +32,11 @@ const App: React.FC = () => {
     }
   }, [setNodes]);
 
+  const manualTick = useCallback(() => {
+    gameRef.current?.tick();
+    updateDerived();
+  }, [updateDerived]);
+
   useEffect(() => {
     gameRef.current = new Game();
     // Demo factories
@@ -39,6 +46,24 @@ const App: React.FC = () => {
     updateDerived();
   }, [updateDerived]);
 
+  useEffect(() => {
+    if (autoTickEnabled) {
+      intervalRef.current = setInterval(() => {
+        gameRef.current?.tick();
+        updateDerived();
+      }, 100);
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [autoTickEnabled, updateDerived]);
+
   const onConnect = useCallback((params: Connection) => {
     gameRef.current?.addEdge(params);
     setEdges((eds) => addEdge(params, eds));
@@ -47,9 +72,13 @@ const App: React.FC = () => {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <div style={{ position: 'absolute', zIndex: 10, padding: 10 }}>
-        <button onClick={() => { gameRef.current?.tick(); updateDerived(); }}>
-          Tick (Advance Game)
-        </button>
+        <div className="controls">
+          <button onClick={manualTick}>
+            Tick (Advance Game)
+          </button>
+          <input type="checkbox" id="autoTick" checked={autoTickEnabled} onChange={(e) => setAutoTickEnabled(e.target.checked)} />
+          <label htmlFor="autoTick">Auto-tick (100ms)</label>
+        </div>
         <div>Grams produced: Watch miners fill smelter!</div>
       </div>
       <ReactFlow
