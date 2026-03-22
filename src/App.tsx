@@ -7,6 +7,7 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
 } from 'reactflow';
+import type { Connection } from 'reactflow';
 import 'reactflow/dist/style.css';
 import FactoryNode from './components/FactoryNode';
 import { Game } from './engine/Game';
@@ -25,9 +26,9 @@ const App: React.FC = () => {
   const updateDerived = useCallback(() => {
     if (gameRef.current) {
       setNodes(gameRef.current.getNodes());
-      setEdges(gameRef.current.getEdges());
+      // Edges managed locally + persisted, no sync needed
     }
-  }, [setNodes, setEdges]);
+  }, [setNodes]);
 
   useEffect(() => {
     gameRef.current = new Game();
@@ -38,7 +39,10 @@ const App: React.FC = () => {
     updateDerived();
   }, [updateDerived]);
 
-  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnect = useCallback((params: Connection) => {
+    gameRef.current?.addEdge(params);
+    setEdges((eds) => addEdge(params, eds));
+  }, [setEdges]);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -54,6 +58,7 @@ const App: React.FC = () => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onEdgesDelete={(deletedEdges) => { deletedEdges.forEach(edge => gameRef.current?.removeEdge(edge.id)); }}
         nodeTypes={nodeTypes}
         fitView
       >
